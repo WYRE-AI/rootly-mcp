@@ -1,0 +1,44 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.wyre-technology/rootly-mcp",
+  "title": "Rootly",
+  "description": "MCP server for Rootly incident management — incidents, alerts, on-call schedules, and teams.",
+  "repository": {
+    "url": "https://github.com/wyre-technology/rootly-mcp",
+    "source": "github"
+  },
+  "version": "0.0.0",
+  "websiteUrl": "https://github.com/wyre-technology/rootly-mcp",
+  "packages": [
+    {
+      "registryType": "oci",
+      "identifier": "ghcr.io/wyre-technology/rootly-mcp:0.0.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "ROOTLY_API_TOKEN",
+          "description": "Rootly API token (Profile -> API Tokens)",
+          "isRequired": true,
+          "isSecret": true,
+          "format": "string"
+        },
+        {
+          "name": "MCP_TRANSPORT",
+          "description": "Transport mode for the server. Set to 'stdio' for local CLI use; the image defaults to 'http' for gateway hosting.",
+          "isRequired": false,
+          "default": "stdio",
+          "format": "string"
+        },
+        {
+          "name": "LOG_LEVEL",
+          "description": "Log verbosity: debug, info, warn, error",
+          "isRequired": false,
+          "default": "info",
+          "format": "string"
+        }
+      ]
+    }
+  ]
+}
