@@ -19,7 +19,12 @@ jobs:
           node-version: ${{ matrix.node-version }}
           registry-url: 'https://npm.pkg.github.com'
           scope: '@wyre-technology'
-      - run: npm ci && npm run build && npm test
+      - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Lint destructive tool warnings
+        run: node scripts/lint-destructive-warnings.mjs src
+      - run: npm run build && npm test
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
