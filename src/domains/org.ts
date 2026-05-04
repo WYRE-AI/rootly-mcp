@@ -84,7 +84,17 @@ function getTools(): Tool[] {
     },
     {
       name: 'rootly_org_teams_delete',
-      description: 'Delete a Rootly team by ID',
+      description:
+        '⚠ DESTRUCTIVE — IRREVERSIBLE. Permanently deletes a Rootly team and removes ' +
+        'all associated configurations, memberships, and incident assignments. ' +
+        'This action cannot be undone. Confirm with the user before invoking.',
+      annotations: {
+        title: 'Delete team (irreversible)',
+        readOnlyHint: false,
+        destructiveHint: true,
+        idempotentHint: false,
+        openWorldHint: true,
+      },
       inputSchema: {
         type: 'object',
         required: ['team_id'],
