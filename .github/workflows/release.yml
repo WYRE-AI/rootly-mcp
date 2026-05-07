@@ -8,25 +8,14 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [20, 22]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ matrix.node-version }}
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@wyre-technology'
-      - run: npm ci
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Lint destructive tool warnings
-        run: node scripts/lint-destructive-warnings.mjs src
-      - run: npm run build && npm test
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    name: Test
+    # Delegated to the canonical reusable CI workflow.
+    # See: ~/.claude/skills/mcp-server-fleet-ci-template
+    uses: wyre-technology/.github/.github/workflows/mcp-server-ci.yml@8f1da6a78d0cc0b8a330547bfc6892da3e72ae13
+    with:
+      node-versions: '["20", "22"]'
+      lint-destructive-warnings: true
+    secrets: inherit
 
   release:
     needs: test
