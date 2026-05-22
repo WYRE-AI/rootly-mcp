@@ -9,6 +9,8 @@ import { elicitTokenIfMissing } from './elicitation/forms.js';
 import { logger } from './utils/logger.js';
 import type { DomainName } from './utils/types.js';
 
+const NAVIGATION_TOOLS = ['rootly_status', 'rootly_navigate', 'rootly_back'];
+
 export function createServer(): Server {
   const server = new Server(
     { name: 'rootly-mcp', version: '1.0.0' },
@@ -41,10 +43,17 @@ export function createServer(): Server {
     const sessionId = (extra as Record<string, unknown>)?.sessionId as string || 'default';
     const state = getState(sessionId);
 
-    // --- Elicitation: collect token if missing (before any action) ---
-    if (!isConfigured() && name !== 'rootly_status') {
-      const elicitError = await elicitTokenIfMissing(server);
-      if (elicitError) return elicitError;
+    // --- Elicitation: collect token if missing (only for domain tools, not navigation) ---
+    if (!isConfigured() && !NAVIGATION_TOOLS.includes(name)) {
+      try {
+        const elicitError = await elicitTokenIfMissing(server);
+        if (elicitError) return elicitError;
+      } catch {
+        return {
+          content: [{ type: 'text' as const, text: 'ROOTLY_API_TOKEN is required. Set it as an environment variable and restart.' }],
+          isError: true,
+        };
+      }
     }
 
     // --- Navigation: rootly_navigate ---
