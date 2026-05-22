@@ -8,7 +8,7 @@ export default defineConfig([
       http: 'src/http.ts',
     },
     format: ['esm'],
-    target: 'node22',
+    target: 'node20',
     outDir: 'dist',
     clean: true,
     dts: true,
