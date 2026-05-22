@@ -19,7 +19,7 @@ export async function elicitForm(
   message: string,
   schema: ElicitSchema
 ): Promise<Record<string, unknown> | null> {
-  const result = await server.elicitInput({ message, requestedSchema: schema });
+  const result = await server.elicitInput({ message, requestedSchema: schema as any });
   if (result.action === 'accept' && result.content) {
     return result.content as Record<string, unknown>;
   }
