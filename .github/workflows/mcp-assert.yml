@@ -11,4 +11,4 @@ jobs:
     uses: wyre-technology/.github/.github/workflows/mcp-assert.yml@17b5a183964aa163d82e9f7092186086e97bc70e  # main
     with:
       entry: dist/index.js
-      canary-tool: rootly_schedules_list
+      canary-tool: rootly_navigate
