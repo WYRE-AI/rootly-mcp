@@ -7,44 +7,6 @@ on:
     branches: [main]
 
 jobs:
-  diagnose:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: read
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          registry-url: 'https://npm.pkg.github.com'
-          scope: '@wyre-technology'
-      - run: npm ci
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - run: npm run build
-      - name: Smoke-test server startup
-        run: |
-          set -euo pipefail
-          node dist/index.js 2>stderr.txt &
-          PID=$!
-          sleep 2
-          # Send MCP initialize
-          printf '\x1b[0m' > /dev/null  # flush
-          echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}' | node dist/index.js 2>stderr2.txt &
-          PID2=$!
-          sleep 3
-          kill $PID2 2>/dev/null || true
-          wait $PID2 2>/dev/null || true
-          echo "=== stderr from background run ==="
-          cat stderr.txt || echo "(empty)"
-          echo "=== stderr from pipe run ==="
-          cat stderr2.txt || echo "(empty)"
-          kill $PID 2>/dev/null || true
-          wait $PID 2>/dev/null || true
-        continue-on-error: true
-
   assert:
     uses: wyre-technology/.github/.github/workflows/mcp-assert.yml@17b5a183964aa163d82e9f7092186086e97bc70e  # main
     with:
