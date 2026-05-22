@@ -40,7 +40,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
-    "@wyre-technology/node-rootly": "^1.0.1"
+    "@wyre-technology/node-rootly": "^1.0.2"
   },
   "devDependencies": {
     "@anthropic-ai/mcpb": "^2.1.0",
