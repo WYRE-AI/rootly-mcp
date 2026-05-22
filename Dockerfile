@@ -2,6 +2,7 @@
 FROM node:22-alpine AS builder
 WORKDIR /app
 COPY package*.json .npmrc ./
+ARG NODE_AUTH_TOKEN
 RUN npm ci --ignore-scripts
 COPY . .
 RUN npm run build
