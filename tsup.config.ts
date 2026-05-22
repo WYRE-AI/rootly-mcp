@@ -14,8 +14,9 @@ export default defineConfig([
     dts: true,
     sourcemap: true,
     banner: { js: '#!/usr/bin/env node' },
-    // Bundle node-rootly directly — the npm package is published without dist/
-    // so we cannot rely on it being resolvable at runtime.
+    // node-rootly is published without its dist/ directory so it cannot be
+    // resolved at runtime. Bundle it directly instead.
+    noExternal: ['@wyre-technology/node-rootly'],
   },
   // Cloudflare Worker build — bundle all deps, esnext target, browser runtime
   {
