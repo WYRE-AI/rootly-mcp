@@ -27,6 +27,7 @@ jobs:
       packages: write
     outputs:
       version: ${{ steps.version.outputs.version }}
+      released: ${{ steps.version.outputs.released }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -41,11 +42,23 @@ jobs:
       - run: npm ci && npm run build
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Capture pre-release version
+        run: |
+          PRE_VERSION=$(node -p "require('./package.json').version")
+          echo "PRE_VERSION=$PRE_VERSION" >> "$GITHUB_ENV"
       - run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - id: version
-        run: echo "version=$(jq -r .version package.json)" >> $GITHUB_OUTPUT
+      - name: Get released version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          if [ "$VERSION" != "$PRE_VERSION" ]; then
+            echo "released=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "released=false" >> "$GITHUB_OUTPUT"
+          fi
 
   docker:
     needs: [test, release]
