@@ -9,7 +9,12 @@
     "skipLibCheck": true,
     "outDir": "dist",
     "rootDir": "src",
-    "sourceMap": true
+    "sourceMap": true,
+    "types": [
+      "node",
+      "vitest/globals"
+    ],
+    "ignoreDeprecations": "6.0"
   },
   "include": [
     "src"
