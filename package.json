@@ -39,20 +39,20 @@
     "url": "https://github.com/wyre-technology/rootly-mcp.git"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.12.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@wyre-technology/node-rootly": "^1.0.2"
   },
   "devDependencies": {
     "@anthropic-ai/mcpb": "^2.1.0",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
-    "@semantic-release/github": "^12.0.6",
+    "@semantic-release/github": "^12.0.8",
     "@types/node": "^26.0.0",
-    "msw": "^2.4.0",
+    "msw": "^2.14.6",
     "tsup": "^8.0.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.9",
-    "wrangler": "^4.0.0"
+    "wrangler": "^4.103.0"
   },
   "engines": {
     "node": ">=18.0.0"
