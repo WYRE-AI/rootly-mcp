@@ -13,10 +13,10 @@ export function startHttpServer(): void {
 
     // Health check — unauthenticated
     if (url.pathname === '/health') {
-      const statusCode = isConfigured() ? 200 : 503;
-      res.writeHead(statusCode, { 'Content-Type': 'application/json' });
+      // liveness: must NOT gate on credentials/config (ACA probe carries none) or the container crash-loops
+      res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({
-        status: isConfigured() ? 'ok' : 'degraded',
+        status: 'ok',
         transport: 'http',
         credentials: { configured: isConfigured() },
         timestamp: new Date().toISOString(),
