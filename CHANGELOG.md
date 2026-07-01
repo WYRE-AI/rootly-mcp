@@ -1,3 +1,8 @@
+## [Unreleased]
+
+### Fixed
+- **health/liveness:** `/health` on the HTTP (Node) transport now always returns `200` instead of gating on `ROOTLY_API_TOKEN` via `isConfigured()`. Credentials are supplied per-request through the gateway, so the environment carries no token — the previous `503` caused the Azure Container Apps liveness probe to crash-loop the container. The `credentials.configured` flag is retained in the response body as a diagnostic only. (`worker.ts` health was already static `200`.)
+
 ## [1.0.6](https://github.com/wyre-technology/rootly-mcp/compare/v1.0.5...v1.0.6) (2026-04-07)
 
 
