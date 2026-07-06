@@ -46,13 +46,13 @@
     "@anthropic-ai/mcpb": "^2.1.0",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
-    "@semantic-release/github": "^12.0.6",
-    "@types/node": "^26.0.0",
-    "msw": "^2.4.0",
+    "@semantic-release/github": "^12.0.9",
+    "@types/node": "^26.1.0",
+    "msw": "^2.14.6",
     "tsup": "^8.0.0",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.9",
-    "wrangler": "^4.0.0"
+    "vitest": "^4.1.10",
+    "wrangler": "^4.107.0"
   },
   "engines": {
     "node": ">=18.0.0"
