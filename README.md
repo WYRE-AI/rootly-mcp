@@ -46,6 +46,18 @@ Uses **decision-tree navigation**: start with `rootly_navigate` to select a doma
 | `rootly_org_list_severities` | List severity levels |
 | `rootly_org_current_user` | Get current authenticated user |
 
+## Interactive Incident Card (MCP Apps)
+
+`rootly_incidents_get` renders as an interactive read-only card in MCP Apps
+hosts (Claude Desktop/web) showing status, severity, services, environments,
+teams, and a lifecycle timeline; plain-JSON behavior is unchanged in other
+hosts. The card is neutral by default and brandable via `window.__BRAND__`
+injection or `MCP_BRAND_*` env vars (`MCP_BRAND_NAME`, `MCP_BRAND_LOGO_URL`,
+`MCP_BRAND_PRIMARY_COLOR`, `MCP_BRAND_ACCENT_COLOR`, `MCP_BRAND_BG`,
+`MCP_BRAND_TEXT`) — no rebuild needed. Rebuild the card bundle itself with
+`npm run build:ui` (only needed when `ui/` changes; the embedded output is
+committed).
+
 ## Setup
 
 ### 1. Install & build

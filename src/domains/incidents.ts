@@ -1,6 +1,7 @@
 import type { Tool } from '@modelcontextprotocol/sdk/types.js';
 import type { DomainHandler, CallToolResult } from '../utils/types.js';
 import { rootlyGet, rootlyPost, rootlyPatch } from '../client.js';
+import { INCIDENT_CARD_META, withIncidentCard } from '../card.builder.js';
 
 function ok(data: unknown): CallToolResult {
   return { content: [{ type: 'text', text: JSON.stringify(data, null, 2) }] };
@@ -28,6 +29,7 @@ function getTools(): Tool[] {
     {
       name: 'rootly_incidents_get',
       description: 'Get a single Rootly incident by ID',
+      _meta: INCIDENT_CARD_META,
       inputSchema: {
         type: 'object',
         required: ['incident_id'],
@@ -95,7 +97,9 @@ async function handleCall(toolName: string, args: Record<string, unknown>): Prom
         return ok(await rootlyGet('/incidents', params));
       }
       case 'rootly_incidents_get':
-        return ok(await rootlyGet(`/incidents/${args.incident_id}`));
+        // withIncidentCard attaches a normalized _card for MCP Apps hosts;
+        // it is best-effort and never alters the rest of the payload.
+        return ok(withIncidentCard(await rootlyGet(`/incidents/${args.incident_id}`)));
 
       case 'rootly_incidents_create': {
         const attrs: Record<string, unknown> = { title: args.title };
