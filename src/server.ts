@@ -6,6 +6,7 @@ import {
 import { getDomainHandler } from './domains/index.js';
 import { isConfigured } from './client.js';
 import { elicitTokenIfMissing } from './elicitation/forms.js';
+import { registerResourceHandlers } from './resources.js';
 import { logger } from './utils/logger.js';
 import type { DomainName } from './utils/types.js';
 
@@ -17,10 +18,14 @@ export function createServer(): Server {
     {
       capabilities: {
         tools: {},
+        resources: {},
         logging: {},
       },
     }
   );
+
+  // MCP Apps (SEP-1865): serve the ui:// incident-card resource
+  registerResourceHandlers(server);
 
   // Dynamic tool list — based on navigation state
   server.setRequestHandler(ListToolsRequestSchema, async (_request, extra) => {
