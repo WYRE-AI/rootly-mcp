@@ -37,17 +37,17 @@ function getTools(): Tool[] {
   ];
 }
 
-async function handleCall(toolName: string, args: Record<string, unknown>): Promise<CallToolResult> {
+async function handleCall(toolName: string, args: Record<string, unknown>, token?: string): Promise<CallToolResult> {
   try {
     switch (toolName) {
       case 'rootly_schedules_list': {
         const params: Record<string, string> = {};
         if (args.limit) params['page[size]'] = String(args.limit);
         if (args.page) params['page[number]'] = String(args.page);
-        return ok(await rootlyGet('/on_call_schedules', params));
+        return ok(await rootlyGet('/on_call_schedules', params, token));
       }
       case 'rootly_schedules_get':
-        return ok(await rootlyGet(`/on_call_schedules/${args.schedule_id}`));
+        return ok(await rootlyGet(`/on_call_schedules/${args.schedule_id}`, undefined, token));
       default:
         return err(`Unknown tool: ${toolName}`);
     }

@@ -11,7 +11,8 @@ export interface DomainHandler {
   getTools(): Tool[];
   handleCall(
     toolName: string,
-    args: Record<string, unknown>
+    args: Record<string, unknown>,
+    token?: string
   ): Promise<CallToolResult>;
 }
 

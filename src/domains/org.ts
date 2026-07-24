@@ -147,7 +147,7 @@ function getTools(): Tool[] {
   ];
 }
 
-async function handleCall(toolName: string, args: Record<string, unknown>): Promise<CallToolResult> {
+async function handleCall(toolName: string, args: Record<string, unknown>, token?: string): Promise<CallToolResult> {
   try {
     switch (toolName) {
       // ── Teams ──────────────────────────────────────────────────────
@@ -155,11 +155,11 @@ async function handleCall(toolName: string, args: Record<string, unknown>): Prom
         const params: Record<string, string> = {};
         if (args.limit) params['page[size]'] = String(args.limit);
         if (args.page) params['page[number]'] = String(args.page);
-        return ok(await rootlyGet('/teams', params));
+        return ok(await rootlyGet('/teams', params, token));
       }
 
       case 'rootly_org_teams_get':
-        return ok(await rootlyGet(`/teams/${args.team_id}`));
+        return ok(await rootlyGet(`/teams/${args.team_id}`, undefined, token));
 
       case 'rootly_org_teams_create': {
         const attrs: Record<string, unknown> = { name: args.name };
@@ -177,7 +177,7 @@ async function handleCall(toolName: string, args: Record<string, unknown>): Prom
           };
         }
 
-        return ok(await rootlyPost('/teams', payload));
+        return ok(await rootlyPost('/teams', payload, token));
       }
 
       case 'rootly_org_teams_update': {
@@ -203,16 +203,16 @@ async function handleCall(toolName: string, args: Record<string, unknown>): Prom
           };
         }
 
-        return ok(await rootlyPut(`/teams/${args.team_id}`, payload));
+        return ok(await rootlyPut(`/teams/${args.team_id}`, payload, token));
       }
 
       case 'rootly_org_teams_delete':
-        await rootlyDelete(`/teams/${args.team_id}`);
+        await rootlyDelete(`/teams/${args.team_id}`, token);
         return ok({ deleted: true, team_id: args.team_id });
 
       case 'rootly_org_teams_patch': {
         // GET current state, merge changes, PUT back — safe partial update
-        const current = await rootlyGet(`/teams/${args.team_id}`) as Record<string, unknown>;
+        const current = await rootlyGet(`/teams/${args.team_id}`, undefined, token) as Record<string, unknown>;
         const currentAttrs = ((current?.data as Record<string, unknown>)?.attributes ?? {}) as Record<string, unknown>;
 
         const mergedAttrs: Record<string, unknown> = {
@@ -240,16 +240,16 @@ async function handleCall(toolName: string, args: Record<string, unknown>): Prom
           };
         }
 
-        return ok(await rootlyPut(`/teams/${args.team_id}`, payload));
+        return ok(await rootlyPut(`/teams/${args.team_id}`, payload, token));
       }
 
       // ── Severities ─────────────────────────────────────────────────
       case 'rootly_org_severities_list':
-        return ok(await rootlyGet('/severities'));
+        return ok(await rootlyGet('/severities', undefined, token));
 
       // ── User ───────────────────────────────────────────────────────
       case 'rootly_org_current_user':
-        return ok(await rootlyGet('/users/me'));
+        return ok(await rootlyGet('/users/me', undefined, token));
 
       default:
         return err(`Unknown tool: ${toolName}`);

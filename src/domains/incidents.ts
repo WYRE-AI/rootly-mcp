@@ -85,7 +85,7 @@ function getTools(): Tool[] {
   ];
 }
 
-async function handleCall(toolName: string, args: Record<string, unknown>): Promise<CallToolResult> {
+async function handleCall(toolName: string, args: Record<string, unknown>, token?: string): Promise<CallToolResult> {
   try {
     switch (toolName) {
       case 'rootly_incidents_list': {
@@ -94,12 +94,12 @@ async function handleCall(toolName: string, args: Record<string, unknown>): Prom
         if (args.severity) params['filter[severity_slug]'] = String(args.severity);
         if (args.limit) params['page[size]'] = String(args.limit);
         if (args.page) params['page[number]'] = String(args.page);
-        return ok(await rootlyGet('/incidents', params));
+        return ok(await rootlyGet('/incidents', params, token));
       }
       case 'rootly_incidents_get':
         // withIncidentCard attaches a normalized _card for MCP Apps hosts;
         // it is best-effort and never alters the rest of the payload.
-        return ok(withIncidentCard(await rootlyGet(`/incidents/${args.incident_id}`)));
+        return ok(withIncidentCard(await rootlyGet(`/incidents/${args.incident_id}`, undefined, token)));
 
       case 'rootly_incidents_create': {
         const attrs: Record<string, unknown> = { title: args.title };
@@ -111,7 +111,7 @@ async function handleCall(toolName: string, args: Record<string, unknown>): Prom
             teams: { data: (args.team_ids as string[]).map((id) => ({ type: 'teams', id })) },
           };
         }
-        return ok(await rootlyPost('/incidents', payload));
+        return ok(await rootlyPost('/incidents', payload, token));
       }
 
       case 'rootly_incidents_update': {
@@ -122,13 +122,13 @@ async function handleCall(toolName: string, args: Record<string, unknown>): Prom
         if (args.severity_id) attrs.severity_id = args.severity_id;
         return ok(await rootlyPatch(`/incidents/${args.incident_id}`, {
           data: { type: 'incidents', id: String(args.incident_id), attributes: attrs },
-        }));
+        }, token));
       }
 
       case 'rootly_incidents_resolve':
         return ok(await rootlyPatch(`/incidents/${args.incident_id}`, {
           data: { type: 'incidents', id: String(args.incident_id), attributes: { status: 'resolved' } },
-        }));
+        }, token));
 
       default:
         return err(`Unknown tool: ${toolName}`);
