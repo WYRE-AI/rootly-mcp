@@ -30,16 +30,16 @@ export default {
       });
     }
 
-    // Inject credentials from Worker environment bindings
-    process.env.ROOTLY_API_TOKEN = env.ROOTLY_API_TOKEN;
-    if (env.LOG_LEVEL) process.env.LOG_LEVEL = env.LOG_LEVEL;
-
     // Stateless: one transport per request
     const transport = new WebStandardStreamableHTTPServerTransport({
       sessionIdGenerator: undefined, // stateless mode
     });
 
-    const server = createServer();
+    // Thread the token through as a parameter rather than writing it to
+    // process.env — a process-global mutated per-request is a race under
+    // concurrent Worker invocations (same anti-pattern fixed this week in
+    // other conduit-prod vendor sidecars).
+    const server = createServer(env.ROOTLY_API_TOKEN);
     await server.connect(transport);
 
     logger.info('Cloudflare Worker handling request');

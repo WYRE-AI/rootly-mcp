@@ -12,7 +12,7 @@ import type { DomainName } from './utils/types.js';
 
 const NAVIGATION_TOOLS = ['rootly_status', 'rootly_navigate', 'rootly_back'];
 
-export function createServer(): Server {
+export function createServer(tokenOverride?: string): Server {
   const server = new Server(
     { name: 'rootly-mcp', version: '1.0.0' },
     {
@@ -49,7 +49,10 @@ export function createServer(): Server {
     const state = getState(sessionId);
 
     // --- Elicitation: collect token if missing (only for domain tools, not navigation) ---
-    if (!isConfigured() && !NAVIGATION_TOOLS.includes(name)) {
+    // In gateway/Worker mode tokenOverride is always set here, so isConfigured()
+    // is always true and this elicitation branch is unreachable there — it only
+    // fires on the single-session stdio path.
+    if (!isConfigured(tokenOverride) && !NAVIGATION_TOOLS.includes(name)) {
       try {
         const elicitError = await elicitTokenIfMissing(server);
         if (elicitError) return elicitError;
@@ -97,7 +100,7 @@ export function createServer(): Server {
 
     // --- Navigation: rootly_status ---
     if (name === 'rootly_status') {
-      const configured = isConfigured();
+      const configured = isConfigured(tokenOverride);
       return {
         content: [{
           type: 'text' as const,
@@ -126,7 +129,7 @@ export function createServer(): Server {
 
     const handler = await getDomainHandler(state.currentDomain);
     try {
-      return await handler.handleCall(name, (args || {}) as Record<string, unknown>);
+      return await handler.handleCall(name, (args || {}) as Record<string, unknown>, tokenOverride);
     } catch (error) {
       logger.error('Tool call failed', { tool: name, error: (error as Error).message });
       return {

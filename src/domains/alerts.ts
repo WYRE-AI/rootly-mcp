@@ -75,7 +75,7 @@ function getTools(): Tool[] {
   ];
 }
 
-async function handleCall(toolName: string, args: Record<string, unknown>): Promise<CallToolResult> {
+async function handleCall(toolName: string, args: Record<string, unknown>, token?: string): Promise<CallToolResult> {
   try {
     switch (toolName) {
       case 'rootly_alerts_list': {
@@ -83,24 +83,24 @@ async function handleCall(toolName: string, args: Record<string, unknown>): Prom
         if (args.status) params['filter[status]'] = String(args.status);
         if (args.limit) params['page[size]'] = String(args.limit);
         if (args.page) params['page[number]'] = String(args.page);
-        return ok(await rootlyGet('/alerts', params));
+        return ok(await rootlyGet('/alerts', params, token));
       }
 
       case 'rootly_alerts_acknowledge':
         return ok(await rootlyPatch(`/alerts/${args.alert_id}`, {
           data: { type: 'alerts', id: String(args.alert_id), attributes: { status: 'acknowledged' } },
-        }));
+        }, token));
 
       case 'rootly_alerts_resolve':
         return ok(await rootlyPatch(`/alerts/${args.alert_id}`, {
           data: { type: 'alerts', id: String(args.alert_id), attributes: { status: 'resolved' } },
-        }));
+        }, token));
 
       case 'rootly_alerts_create': {
         const attrs: Record<string, unknown> = { summary: args.summary };
         if (args.source) attrs.source = args.source;
         if (args.severity) attrs.severity = args.severity;
-        return ok(await rootlyPost('/alerts', { data: { type: 'alerts', attributes: attrs } }));
+        return ok(await rootlyPost('/alerts', { data: { type: 'alerts', attributes: attrs } }, token));
       }
 
       case 'rootly_alerts_update': {
@@ -109,7 +109,7 @@ async function handleCall(toolName: string, args: Record<string, unknown>): Prom
         if (args.summary) attrs.summary = args.summary;
         return ok(await rootlyPatch(`/alerts/${args.alert_id}`, {
           data: { type: 'alerts', id: String(args.alert_id), attributes: attrs },
-        }));
+        }, token));
       }
 
       default:
