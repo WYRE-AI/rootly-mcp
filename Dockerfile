@@ -22,5 +22,5 @@ ENV NODE_ENV=production \
     MCP_TRANSPORT=http \
     MCP_HTTP_PORT=8080 \
     LOG_LEVEL=info
-LABEL io.modelcontextprotocol.server.name="io.github.wyre-technology/rootly-mcp"
+LABEL io.modelcontextprotocol.server.name="io.github.WYRE-AI/rootly-mcp"
 CMD ["node", "dist/http.js"]

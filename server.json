@@ -1,18 +1,18 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.wyre-technology/rootly-mcp",
+  "name": "io.github.WYRE-AI/rootly-mcp",
   "title": "Rootly",
   "description": "MCP server for Rootly \u2014 incidents, alerts, escalations, and post-incident reports.",
   "repository": {
-    "url": "https://github.com/wyre-technology/rootly-mcp",
+    "url": "https://github.com/WYRE-AI/rootly-mcp",
     "source": "github"
   },
   "version": "0.0.0",
-  "websiteUrl": "https://github.com/wyre-technology/rootly-mcp",
+  "websiteUrl": "https://github.com/WYRE-AI/rootly-mcp",
   "packages": [
     {
       "registryType": "oci",
-      "identifier": "ghcr.io/wyre-technology/rootly-mcp:0.0.0",
+      "identifier": "ghcr.io/wyre-ai/rootly-mcp:0.0.0",
       "transport": {
         "type": "stdio"
       },
