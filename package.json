@@ -1,5 +1,5 @@
 {
-  "name": "@wyre-technology/rootly-mcp",
+  "name": "@wyre-ai/rootly-mcp",
   "version": "1.0.6",
   "description": "MCP server for the Rootly incident management platform",
   "type": "module",
@@ -37,7 +37,7 @@
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wyre-technology/rootly-mcp.git"
+    "url": "https://github.com/WYRE-AI/rootly-mcp.git"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",

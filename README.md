@@ -94,7 +94,7 @@ ROOTLY_API_TOKEN=your_token MCP_TRANSPORT=http node dist/http.js
 ```bash
 docker compose up
 # or
-docker run -e ROOTLY_API_TOKEN=your_token ghcr.io/wyre-technology/rootly-mcp:latest
+docker run -e ROOTLY_API_TOKEN=your_token ghcr.io/wyre-ai/rootly-mcp:latest
 ```
 
 ## mcporter Configuration
@@ -115,7 +115,7 @@ Then: `mcporter call rootly.rootly_navigate --domain alerts`
 
 ## Claude Desktop (MCPB)
 
-Download the `.mcpb` bundle from [Releases](https://github.com/wyre-technology/rootly-mcp/releases) and install it in Claude Desktop.
+Download the `.mcpb` bundle from [Releases](https://github.com/WYRE-AI/rootly-mcp/releases) and install it in Claude Desktop.
 
 Or manually add to `claude_desktop_config.json`:
 

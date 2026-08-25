@@ -143,7 +143,7 @@ jobs:
         run: |
           jq --arg v "$VERSION" \
             '.version = $v
-             | .packages[0].identifier = "ghcr.io/wyre-technology/rootly-mcp:v" + $v' \
+             | .packages[0].identifier = "ghcr.io/wyre-ai/rootly-mcp:v" + $v' \
             server.json > server.json.tmp
           mv server.json.tmp server.json
           cat server.json
@@ -160,5 +160,5 @@ jobs:
       - name: Verify registry listing
         run: |
           sleep 5
-          curl -sf "https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.wyre-technology/rootly-mcp" \
+          curl -sf "https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.WYRE-AI/rootly-mcp" \
             | jq '.servers[] | {name, version}'
