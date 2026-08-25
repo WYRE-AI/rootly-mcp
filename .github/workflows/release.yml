@@ -83,8 +83,8 @@ jobs:
           build-args: |
             NODE_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }}
           tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:v${{ needs.release.outputs.version }}
+            ghcr.io/wyre-ai/rootly-mcp:latest
+            ghcr.io/wyre-ai/rootly-mcp:v${{ needs.release.outputs.version }}
 
   mcpb:
     needs: [test, release]
