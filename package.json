@@ -45,18 +45,18 @@
   },
   "devDependencies": {
     "@anthropic-ai/mcpb": "^2.1.0",
-    "@modelcontextprotocol/ext-apps": "^1.7.5",
+    "@modelcontextprotocol/ext-apps": "^2.0.0",
     "@semantic-release/changelog": "^7.0.0",
     "@semantic-release/git": "^11.0.1",
     "@semantic-release/github": "^12.0.9",
-    "@types/node": "^26.2.0",
+    "@types/node": "^26.5.1",
     "msw": "^2.15.0",
     "tsup": "^8.0.0",
     "typescript": "^6.0.3",
-    "vite": "^8.2.2",
+    "vite": "^8.3.0",
     "vite-plugin-singlefile": "^2.3.3",
-    "vitest": "^4.1.11",
-    "wrangler": "^4.125.0"
+    "vitest": "^5.0.0",
+    "wrangler": "^4.131.0"
   },
   "engines": {
     "node": ">=18.0.0"
