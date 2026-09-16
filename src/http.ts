@@ -3,6 +3,13 @@ import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/
 import { createServer } from './server.js';
 import { isConfigured } from './client.js';
 import { logger } from './utils/logger.js';
+import { verifyS2sHeader, S2S_HEADER } from './s2s-verify.js';
+
+// Conduit service-to-service auth (gateway#377 parity). Non-empty =
+// enforce X-Gateway-S2S on every /mcp request; empty = disabled, behavior
+// exactly as before (dark-by-default until the gateway provisions this
+// container's derived subkey). See src/s2s-verify.ts.
+const S2S_SECRET = process.env.CONDUIT_S2S_SECRET || '';
 
 export function startHttpServer(): void {
   const port = parseInt(process.env.MCP_HTTP_PORT || '8080', 10);
@@ -30,6 +37,19 @@ export function startHttpServer(): void {
       return;
     }
 
+    // S2S guard runs first: a forged request must never reach the MCP
+    // server/transport, where the first tool call would touch credentials.
+    if (S2S_SECRET && !verifyS2sHeader(req.headers[S2S_HEADER] as string | undefined, S2S_SECRET)) {
+      res.writeHead(401, { 'Content-Type': 'application/json' });
+      res.end(
+        JSON.stringify({
+          error:
+            'Missing or invalid X-Gateway-S2S header: this endpoint only accepts requests signed by the gateway.',
+        }),
+      );
+      return;
+    }
+
     // Create fresh server + transport per request (stateless)
     const server = createServer();
     const transport = new StreamableHTTPServerTransport({
@@ -47,7 +67,7 @@ export function startHttpServer(): void {
   });
 
   httpServer.listen(port, host, () => {
-    logger.info(`HTTP streaming server listening on ${host}:${port}`);
+    logger.info(`HTTP streaming server listening on ${host}:${port}`, { s2sEnforced: S2S_SECRET !== '' });
   });
 }
 
