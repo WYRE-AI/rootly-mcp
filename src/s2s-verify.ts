@@ -26,6 +26,14 @@ export const S2S_HEADER = "x-gateway-s2s";
 
 const HEADER_VALUE_RE = /^t=(\d{1,15}),v1=([0-9a-f]{64})$/;
 
+/**
+ * Verify an inbound `X-Gateway-S2S` header value.
+ *
+ * Accepts only `t=<unixSeconds>,v1=<64-hex>` where the timestamp is within
+ * `maxSkewSeconds` of now (both directions) and the HMAC matches under a
+ * constant-time comparison. Returns false for a missing/malformed header,
+ * a stale or future-dated timestamp, a bad signature, or an empty secret.
+ */
 export function verifyS2sHeader(
   headerValue: string | undefined,
   secret: string,
