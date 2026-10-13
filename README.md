@@ -84,17 +84,85 @@ ROOTLY_API_TOKEN=your_token node dist/index.js
 
 ### 4. Run (HTTP streaming transport)
 
+`CONDUIT_S2S_SECRET` is required. If it is empty or a known placeholder (`changeme`, `change-me`, `secret`, `example`, `placeholder`, `replace-me`, `your-secret`, `your-s2s-secret`, `s2s-secret`, `replace-with-a-real-secret`), the HTTP server logs an error and exits non-zero. It never prints the secret.
+
 ```bash
-ROOTLY_API_TOKEN=your_token MCP_TRANSPORT=http node dist/http.js
-# Listens on :8080 — /mcp for MCP, /health for health check
+# Refuses to start until CONDUIT_S2S_SECRET is set. With a secret and no
+# MCP_HTTP_HOST, the process binds 0.0.0.0 (same as container deploys).
+CONDUIT_S2S_SECRET="$CONDUIT_S2S_SECRET" \
+  ROOTLY_API_TOKEN=your_token \
+  MCP_HTTP_HOST=127.0.0.1 \
+  npm run start:http
+
+# Local HTTP only, without a service-to-service secret. Always binds 127.0.0.1.
+# A non-loopback MCP_HTTP_HOST is overridden and that override is logged.
+MCP_ALLOW_INSECURE_DEV=1 npm run start:http
 ```
+
+`/health` stays unauthenticated, does not require `X-Gateway-S2S`, and does not return the API token. The stdio transport does not use `CONDUIT_S2S_SECRET`.
 
 ### 5. Run with Docker
 
+The image listens on `0.0.0.0` inside the container (`MCP_HTTP_HOST`) and defaults to `AUTH_MODE=gateway`. Publish the port on loopback and pass the S2S secret. In gateway mode the Rootly token arrives on each request as `X-Rootly-Api-Token`; it is not read from the environment.
+
 ```bash
-docker compose up
-# or
-docker run -e ROOTLY_API_TOKEN=your_token ghcr.io/wyre-ai/rootly-mcp:latest
+docker build -t rootly-mcp .
+docker run \
+  -e CONDUIT_S2S_SECRET="$(openssl rand -hex 32)" \
+  -p 127.0.0.1:8080:8080 \
+  rootly-mcp
+```
+
+Do not pass a known placeholder such as `your-s2s-secret` or `changeme`. Startup treats those as unset and exits. Compose refuses to start when `CONDUIT_S2S_SECRET` is unset, sets `AUTH_MODE=gateway`, does not pass `ROOTLY_API_TOKEN`, and publishes `127.0.0.1:8080:8080`. A project `.env` is interpolation only — do not add `env_file` to the gateway service.
+
+```bash
+CONDUIT_S2S_SECRET="$(openssl rand -hex 32)" docker compose up
+```
+
+Single-tenant HTTP (`AUTH_MODE=env`) still requires the S2S secret, then uses `ROOTLY_API_TOKEN`:
+
+```bash
+docker run \
+  -e CONDUIT_S2S_SECRET="$(openssl rand -hex 32)" \
+  -e AUTH_MODE=env \
+  -e ROOTLY_API_TOKEN=your_token \
+  -e MCP_HTTP_HOST=0.0.0.0 \
+  -p 127.0.0.1:8080:8080 \
+  rootly-mcp
+```
+
+## Configuration
+
+Copy [`.env.example`](.env.example) and set the variables below.
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `ROOTLY_API_TOKEN` | For stdio and `AUTH_MODE=env` | Rootly API token (Bearer). Gateway mode does not read this. |
+| `MCP_TRANSPORT` | No | `stdio` (default) or `http` |
+| `AUTH_MODE` | No | `gateway` (Docker image and Compose default) or `env`. Gateway mode requires `X-Rootly-Api-Token` on each `/mcp` request and never falls back to `ROOTLY_API_TOKEN`. `env` uses that variable after S2S auth succeeds. |
+| `CONDUIT_S2S_SECRET` | Yes for HTTP | Service-to-service secret. The HTTP server logs an error and exits non-zero when this is empty or a known placeholder. Compose will not start without it. Never commit a real value. |
+| `MCP_ALLOW_INSECURE_DEV` | No | Set to exactly `1` only for local development to start HTTP without `CONDUIT_S2S_SECRET`. The process logs a warning, does not enforce `X-Gateway-S2S`, and binds `127.0.0.1` only. A non-loopback `MCP_HTTP_HOST` is overridden and logged. A placeholder secret still refuses to start. |
+| `MCP_HTTP_HOST` | No | Bind address when a secret is configured. Unset means `0.0.0.0`. The container image sets `0.0.0.0`. Ignored in favor of `127.0.0.1` when the insecure-dev bypass is on. |
+| `MCP_HTTP_PORT` | No | HTTP port. Defaults to `8080`. |
+| `LOG_LEVEL` | No | `debug`, `info`, `warn`, or `error`. Defaults to `info`. |
+
+### HTTP authentication
+
+With `MCP_TRANSPORT=http` and `CONDUIT_S2S_SECRET` set, every `/mcp` request must include `X-Gateway-S2S`. The value is `t=<unix seconds>,v1=<hex hmac-sha256>`. The hex digest is HMAC-SHA256 over the exact ASCII string `t=<unix seconds>` (the same prefix that appears in the header), keyed with `CONDUIT_S2S_SECRET`, encoded as 64 lowercase hex characters. The timestamp must be within 300 seconds of the server clock. A missing or invalid header returns 401. The secret is never written to logs or the response.
+
+```
+X-Gateway-S2S: t=1710000000,v1=<64 lowercase hex chars>
+```
+
+In `AUTH_MODE=gateway`, `/mcp` also requires `X-Rootly-Api-Token`. That header is the only Rootly credential for the request. A request without it returns 401 and does not fall back to `ROOTLY_API_TOKEN`.
+
+```bash
+curl -sS http://127.0.0.1:8080/mcp \
+  -H 'content-type: application/json' \
+  -H 'accept: application/json, text/event-stream' \
+  -H "x-gateway-s2s: $X_GATEWAY_S2S" \
+  -H "x-rootly-api-token: $ROOTLY_API_TOKEN" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"rootly_status","arguments":{}}}'
 ```
 
 ## mcporter Configuration

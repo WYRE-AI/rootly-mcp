@@ -51,7 +51,7 @@ describe('verifyS2sHeader', () => {
     expect(verifyS2sHeader(undefined, SECRET)).toBe(false);
   });
 
-  it('rejects when the secret is empty (dark-by-default guarantee)', () => {
+  it('rejects when the secret is empty', () => {
     expect(verifyS2sHeader(mintHeader(SECRET, NOW), '')).toBe(false);
   });
 

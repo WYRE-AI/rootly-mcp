@@ -20,7 +20,17 @@ services:
     envs:
       - key: MCP_TRANSPORT
         value: http
+      - key: MCP_HTTP_HOST
+        value: 0.0.0.0
+      # Single-tenant App Platform service. The image defaults to gateway
+      # mode; this override keeps the process token. HTTP still requires
+      # CONDUIT_S2S_SECRET or the process exits.
+      - key: AUTH_MODE
+        value: env
       - key: ROOTLY_API_TOKEN
+        type: SECRET
+        scope: RUN_TIME
+      - key: CONDUIT_S2S_SECRET
         type: SECRET
         scope: RUN_TIME
       - key: LOG_LEVEL
