@@ -19,7 +19,7 @@
     "test:coverage": "vitest run --coverage",
     "lint": "tsc --noEmit",
     "clean": "rm -rf dist",
-    "mcpb:pack": "npm run build && npm install --omit=dev --ignore-scripts && mcpb pack",
+    "pack:mcpb": "npm run build && npm install --omit=dev --ignore-scripts && mcpb pack",
     "cf:deploy": "npm run build && wrangler deploy",
     "cf:dev": "npm run build && wrangler dev"
   },
